@@ -15,6 +15,7 @@ library(lubridate)
 library(ical)
 library(wesanderson)
 library(scales)
+library(lubridate)
 ```
 
 ```{r}
@@ -75,6 +76,8 @@ ggplot(date_summary, aes(x = total_work_time)) + geom_histogram(binwidth = 1, co
 )
 
 ```
+
+
 ```{r}
 ggplot(calendar_data, aes(x=hours)) + geom_histogram(binwidth = 0.5, color = "white") + facet_wrap(~summary)
 ```
@@ -96,5 +99,18 @@ ggplot(class_summary, aes(x = summary, y = total_time)) + geom_col()
 ```
 
 
+```{r}
+calendar_data <- calendar_data %>% 
+  group_by(date) %>% 
+  arrange(date) %>% 
+  mutate(week = ifelse(date < "2021-10-18", 1, 2))
 
+week_summary <- calendar_data %>% 
+  group_by(week) %>% 
+  summarize(
+    total_hours = sum(hours)
+  )
+
+ggplot(week_summary,  aes(x = factor(week), y = total_hours)) + geom_col()
+```
 
