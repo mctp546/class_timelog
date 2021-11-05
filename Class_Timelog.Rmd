@@ -47,8 +47,9 @@ calendar_data <- "eek.ics" %>%
 calendar_data <- calendar_data %>% 
   mutate(week = cut(date, "week", start.on.monday = TRUE))
 
+calendar_data <- calendar_data %>% 
+  mutate(day_of_week = weekdays(date))
 
-View(calendar_data)
 ```
 
 ```{r}
@@ -94,8 +95,6 @@ date_summary <- calendar_data %>%
 
 date_summary
 
-ggplot(date_summary, aes(x = date, y = total_work_time, fill = "#0FFFBB")) + 
-  geom_col() + scale_fill_manual(values = "#C3107E")
 
 ggplot(date_summary, aes(x = total_work_time)) + 
   geom_histogram(binwidth = 1, color = "white") + labs(
@@ -108,6 +107,14 @@ ggplot(date_summary, aes(x = total_work_time)) +
 ```{r}
 ggplot(calendar_data, aes(x=hours)) + 
   geom_histogram(binwidth = 0.5, color = "white") + facet_wrap(~summary)
+
+day_summary <- calendar_data %>% 
+  group_by(day_of_week, summary) %>% 
+  summarize(mean_time = mean(hours))
+
+ggplot(day_summary, aes(x = day_of_week, y = mean_time, fill = summary)) + 
+  geom_col() + 
+  scale_fill_manual(values = c("#FF1053", "#11B5E4", "#8710A9", "#000000"))
 ```
 
 ```{r}
@@ -118,12 +125,6 @@ class_summary <- calendar_data %>%
             total_time = sum(hours)
             )
 class_summary
-```
-
-
-
-```{r}
-ggplot(class_summary, aes(x = summary, y = total_time)) + geom_col()
 ```
 
 
