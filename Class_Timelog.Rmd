@@ -1,8 +1,10 @@
 ---
 title: "Class_Timelog"
+author: "Maeve Tyler-Penny"
 output:
-  pdf_document: default
-  html_document: default
+  html_document:
+    toc: no
+    df_print: paged
 ---
 
 ```{r setup, include=FALSE}
@@ -10,8 +12,7 @@ knitr::opts_chunk$set(echo = TRUE)
 ```
 
 
-```{r}
-library(ggplot2)
+```{r, echo=FALSE, message=FALSE}
 library(dplyr)
 library(lubridate)
 library(ical)
@@ -19,9 +20,10 @@ library(wesanderson)
 library(scales)
 library(lubridate)
 library(tidyverse)
+library(ggiraph)
 ```
-
-```{r}
+## Calendar Data
+```{r, echo=FALSE, message=FALSE}
 calendar_data <- "eek.ics" %>% 
   # Use ical package to import into R and then convert to "tibble" data frame format:
   ical_parse_df() %>% 
@@ -43,7 +45,7 @@ calendar_data <- "eek.ics" %>%
   calendar_data <- filter(calendar_data, date > 2000-01-01)
 ```
 
-```{r}
+```{r, echo=FALSE}
 calendar_data <- calendar_data %>% 
   mutate(week = cut(date, "week", start.on.monday = TRUE))
 
@@ -52,16 +54,8 @@ calendar_data <- calendar_data %>%
 
 ```
 
-```{r}
-# week1 <- calendar_data %>% 
-#   filter(week == 1)
-# 
-# week2 <- calendar_data %>% 
-#   filter(week == 2)
-# 
-# week3 <- calendar_data %>% 
-#   filter(week == 3)
-
+## Time split by class, date, and week
+```{r, echo=FALSE}
 ggplot(calendar_data, aes(x = date, y = hours, fill = summary)) + geom_col(
   position = position_dodge(preserve = "single")) + labs(
   x = "Date",
@@ -70,25 +64,29 @@ ggplot(calendar_data, aes(x = date, y = hours, fill = summary)) + geom_col(
   fill = "Class"
 ) +
   scale_fill_manual(
-  values = c("#FF1053", "#11B5E4", "#8710A9", "#000000")) + facet_wrap(~week, nrow = 2, scales = "free_x")
-
-
+  values = c("#FF1053", "#11B5E4", "#8710A9", "#000000")) + facet_wrap(~week, ncol = 3, scales = "free_x")
 ```
 
-```{r}
+## Class proportions by day
+```{r, echo=FALSE}
 ggplot(calendar_data, 
        aes(x = date, y = hours, fill = summary)) + 
   geom_col(position = "fill") + scale_fill_manual(
              values = c("#FF1053", "#11B5E4", "#8710A9", "#000000"))
 ```
 
-```{r}
+## Distribution of time split by class
+```{r, echo=FALSE}
 ggplot(calendar_data, aes(x = hours, y = summary, fill = summary)) + 
   geom_boxplot() + 
-  scale_fill_manual(values = c("#FF1053", "#11B5E4", "#8710A9", "#000000"))
+  scale_fill_manual(values = c("#FF1053", "#11B5E4", "#8710A9", "#000000")) +
+  labs(title = "Distribution of class hours",
+       y = "class"
+       )
 ```
 
-```{r}
+## Distribution of total work hours by day
+```{r, echo=FALSE}
 date_summary <- calendar_data %>% 
   group_by(date) %>% 
   summarize(total_work_time = sum(hours))
@@ -96,15 +94,20 @@ date_summary <- calendar_data %>%
 date_summary
 
 
-ggplot(date_summary, aes(x = total_work_time)) + 
-  geom_histogram(binwidth = 1, color = "white") + labs(
-  title = "Histogram of school hours by date"
+ggplot(date_summary, aes(x = total_work_time)) +
+  geom_histogram(binwidth = 0.5, color = "white") +
+  labs(
+  title = "Histogram of school hours by date",
+  x = "hours",
+  y = "count"
 )
+
+hist(date_summary$total_work_time)
 
 ```
 
-
-```{r}
+## Visualizations Five & Six
+```{r, echo=FALSE}
 ggplot(calendar_data, aes(x=hours)) + 
   geom_histogram(binwidth = 0.5, color = "white") + facet_wrap(~summary)
 
@@ -117,25 +120,34 @@ ggplot(day_summary, aes(x = day_of_week, y = mean_time, fill = summary)) +
   scale_fill_manual(values = c("#FF1053", "#11B5E4", "#8710A9", "#000000"))
 ```
 
-```{r}
+## Week Summary
+```{r, echo=FALSE}
 class_summary <- calendar_data %>%
   group_by(summary) %>%
   summarize(avg_class_time = mean(hours),
             median_class_time = median(hours),
             total_time = sum(hours)
             )
-class_summary
 ```
 
 
-```{r}
+```{r, echo=FALSE}
 week_summary <- calendar_data %>% 
   group_by(week) %>% 
   summarize(
     total_hours = sum(hours)
   )
 
-ggplot(week_summary,  aes(x = factor(week), y = total_hours)) + geom_col()
+bar1 <- ggplot(week_summary,  aes(x = factor(week), y = total_hours, tooltip = total_hours, data_id = week)) + 
+  # geom_col() +
+  # theme(axis.text.x = element_text(angle=25)) +
+  # labs(title = "School Hours by Week",
+  #      x = "week",
+  #      y = "hours") + 
+  geom_col_interactive()
+
+x <- girafe(ggobj = bar1)
+if ( interactive() ) print(x)
 ```
 
 
