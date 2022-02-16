@@ -2,6 +2,8 @@
 title: "Class_Timelog"
 author: "Maeve Tyler-Penny"
 output:
+  pdf_document:
+    toc: no
   html_document:
     toc: no
     df_print: paged
@@ -150,4 +152,8 @@ x <- girafe(ggobj = bar1)
 if ( interactive() ) print(x)
 ```
 
+
+## Code Sources
+Lines 27-45 taken from Miniproject 1 code written by Albert Kim for SDS 192, 
+Fall 2021.
 

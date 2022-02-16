@@ -1,8 +1,8 @@
 ---
 title: "Spring '22 Timelog"
 output:
-  html_document: default
   pdf_document: default
+  html_document: default
 ---
 
 ```{r setup, include=FALSE}
@@ -94,3 +94,7 @@ ggplot(class_data2, aes(x = class_time, y = summary, fill = summary)) +
   geom_col() + 
   scale_fill_manual(values = c("#F6F930", "#16E0BD", "#78C3FB", "#000000"))
 ```
+
+## Code Sources
+Lines 21-39 taken from Miniproject 1 code written by Albert Kim for SDS 192, 
+Fall 2021.
