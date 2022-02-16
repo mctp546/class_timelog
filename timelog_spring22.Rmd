@@ -1,0 +1,96 @@
+---
+title: "Spring '22 Timelog"
+output:
+  html_document: default
+  pdf_document: default
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Spring '22 Timelog
+
+```{r, message=F, echo=FALSE, warning=FALSE}
+library(tidyverse)
+library(ical)
+library(lubridate)
+```
+
+```{r, echo=FALSE}
+calendar_data2 <- "sproing22.ics" %>% 
+  # Use ical package to import into R and then convert to "tibble" data frame format:
+  ical_parse_df() %>% 
+  as_tibble() %>% 
+  # Use lubridate packge to wrangle dates and times. We'll do this later this semester:
+  mutate(
+    start_datetime = with_tz(start, tzone = "America/New_York"),
+    end_datetime = with_tz(end, tzone = "America/New_York"),
+    minutes = end_datetime - start_datetime,
+    date = floor_date(start_datetime, unit = "day")
+  ) %>%
+  # Make calendar entry summary all lowercase:
+  mutate(summary = tolower(summary)) %>% 
+  # Do data wrangling to compute number of minutes and hours:
+  group_by(date, summary) %>%
+  summarize(minutes = sum(minutes) %>% as.numeric()) %>%
+  mutate(hours = minutes/60) %>% 
+  mutate(date = as.Date(date))
+  calendar_data2 <- filter(calendar_data2, date > 2000-01-01)
+```
+
+```{r, echo=FALSE}
+calendar_data2 <- calendar_data2 %>% 
+  mutate(week = cut(date, "week", start.on.monday = TRUE))
+
+calendar_data2 <- calendar_data2 %>% 
+  mutate(day_of_week = weekdays(date))
+```
+
+```{r, echo=FALSE}
+ggplot(calendar_data2, aes(x = date, y = hours, fill = summary)) + geom_col(
+  position = position_dodge(preserve = "single")) + labs(
+  x = "Date",
+  y = "Hours",
+  title = "Comparison of Class Work Hours",
+  fill = "Class"
+) +
+  scale_fill_manual(
+  values = c("#F6F930", "#16E0BD", "#78C3FB", "#000000")) + facet_wrap(~week, ncol = 3, scales = "free_x")
+```
+
+```{r, echo=FALSE}
+ggplot(calendar_data2, aes(x = hours, y = summary, fill = summary)) + 
+  geom_boxplot() + 
+  scale_fill_manual(values = c("#F6F930", "#16E0BD", "#78C3FB", "#000000")) +
+  labs(title = "Distribution of class hours",
+       y = "class"
+       )
+```
+
+```{r, echo=FALSE}
+date_summary2 <- calendar_data2 %>% 
+  group_by(date) %>% 
+  summarize(total_work_time = sum(hours))
+
+
+ggplot(date_summary2, aes(x = total_work_time)) +
+  geom_histogram(binwidth = 0.5, color = "white") +
+  labs(
+  title = "Histogram of school hours by date",
+  x = "hours",
+  y = "count"
+)
+```
+
+```{r, echo=FALSE}
+class_data2 <- calendar_data2 %>% 
+  group_by(summary) %>% 
+  summarize(class_time = sum(hours))
+```
+
+```{r, echo=FALSE}
+ggplot(class_data2, aes(x = class_time, y = summary, fill = summary)) + 
+  geom_col() + 
+  scale_fill_manual(values = c("#F6F930", "#16E0BD", "#78C3FB", "#000000"))
+```
