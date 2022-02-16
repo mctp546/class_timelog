@@ -121,7 +121,7 @@ ggplot(day_summary, aes(x = day_of_week, y = mean_time, fill = summary)) +
   geom_col() + 
   scale_fill_manual(values = c("#FF1053", "#11B5E4", "#8710A9", "#000000"))
 ```
-
+ 
 ## Week Summary
 ```{r, echo=FALSE}
 class_summary <- calendar_data %>%
