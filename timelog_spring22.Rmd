@@ -1,8 +1,8 @@
 ---
 title: "Spring '22 Timelog"
 output:
-  pdf_document: default
   html_document: default
+  pdf_document: default
 ---
 
 ```{r setup, include=FALSE}
@@ -17,7 +17,7 @@ library(ical)
 library(lubridate)
 ```
 
-```{r, echo=FALSE}
+```{r, echo=FALSE, warning=FALSE, message=FALSE}
 calendar_data2 <- "sproing22.ics" %>% 
   # Use ical package to import into R and then convert to "tibble" data frame format:
   ical_parse_df() %>% 
@@ -92,7 +92,24 @@ class_data2 <- calendar_data2 %>%
 ```{r, echo=FALSE}
 ggplot(class_data2, aes(x = class_time, y = summary, fill = summary)) + 
   geom_col() + 
-  scale_fill_manual(values = c("#F6F930", "#16E0BD", "#78C3FB", "#000000"))
+  scale_fill_manual(values = c("#F6F930", "#16E0BD", "#78C3FB", "#000000")) +
+  labs(x = "Total hours logged",
+       y = "Class",
+       title = "Total hours logged by class")
+```
+
+## Week Summary
+
+```{r, echo=FALSE, message=FALSE}
+week_summary2 <- calendar_data2 %>% 
+  group_by(week) %>% 
+  summarize(
+    total_hours = sum(hours)
+  )
+```
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE}
+ggplot(week_summary2, aes(week, total_hours)) + geom_col()
 ```
 
 ## Code Sources
