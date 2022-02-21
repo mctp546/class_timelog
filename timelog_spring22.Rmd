@@ -1,8 +1,8 @@
 ---
 title: "Spring '22 Timelog"
 output:
-  html_document: default
   pdf_document: default
+  html_document: default
 ---
 
 ```{r setup, include=FALSE}
@@ -109,7 +109,10 @@ week_summary2 <- calendar_data2 %>%
 ```
 
 ```{r, echo=FALSE, message=FALSE, warning=FALSE}
-ggplot(week_summary2, aes(week, total_hours)) + geom_col()
+ggplot(week_summary2, aes(week, total_hours)) + geom_col() +
+  labs(title = "Hours worked per week",
+       x = "Week",
+       y = "Total hours")
 ```
 
 ## Code Sources
