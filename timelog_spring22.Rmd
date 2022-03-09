@@ -1,8 +1,8 @@
 ---
 title: "Spring '22 Timelog"
 output:
-  pdf_document: default
   html_document: default
+  pdf_document: default
 ---
 
 ```{r setup, include=FALSE}
@@ -64,8 +64,7 @@ ggplot(calendar_data2, aes(x = hours, y = summary, fill = summary)) +
   geom_boxplot() + 
   scale_fill_manual(values = c("#F6F930", "#16E0BD", "#78C3FB", "#000000")) +
   labs(title = "Distribution of class hours",
-       y = "class"
-       )
+       y = "class")
 ```
 
 ```{r, echo=FALSE}
